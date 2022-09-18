@@ -2,11 +2,14 @@ package com.untralvious.demo.security.domain;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 @Table(name = "sys_user", schema = "securityexample", catalog = "")
 public class SysUser {
+
     private String id;
+
     private String username;
     private String realname;
     private String password;
@@ -36,6 +39,8 @@ public class SysUser {
 
     @Id
     @Column(name = "id", nullable = false, length = 32)
+    @GeneratedValue(generator="system-uuid")
+    @GenericGenerator(name="system-uuid", strategy = "uuid")
     public String getId() {
         return id;
     }
@@ -44,15 +49,15 @@ public class SysUser {
         this.id = id;
     }
 
-    @Basic
-    @Column(name = "username", nullable = true, length = 100)
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
+//    @Basic
+//    @Column(name = "username", nullable = true, length = 100)
+//    public String getUsername() {
+//        return username;
+//    }
+//
+//    public void setUsername(String username) {
+//        this.username = username;
+//    }
 
     @Basic
     @Column(name = "realname", nullable = true, length = 100)
@@ -375,5 +380,15 @@ public class SysUser {
         result = 31 * result + (relTenantIds != null ? relTenantIds.hashCode() : 0);
         result = 31 * result + (clientId != null ? clientId.hashCode() : 0);
         return result;
+    }
+
+    @Basic
+    @Column(name = "username", nullable = true, length = 100)
+    public String getLogin() {
+        return this.username;
+    }
+
+    public void setLogin(String username){
+        this.username = username;
     }
 }

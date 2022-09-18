@@ -1,5 +1,6 @@
 package com.untralvious.demo.security.web.rest;
 
+import com.untralvious.demo.security.domain.SysUser;
 import com.untralvious.demo.security.domain.User;
 import com.untralvious.demo.security.repository.UserRepository;
 import com.untralvious.demo.security.security.SecurityUtils;
@@ -61,8 +62,8 @@ public class AccountResource {
         if (isPasswordLengthInvalid(managedUserVM.getPassword())) {
             throw new InvalidPasswordException();
         }
-        User user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
-        mailService.sendActivationEmail(user);
+        SysUser user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
+        //mailService.sendActivationEmail(user);
     }
 
     /**
