@@ -31,6 +31,8 @@ public class TokenProvider {
 
     private static final String AUTHORITIES_KEY = "auth";
 
+    private static final String DEPART_ID = "depart_id";
+
     private static final String INVALID_JWT_TOKEN = "Invalid JWT token.";
 
     private final Key key;
@@ -88,6 +90,7 @@ public class TokenProvider {
             .builder()
             .setSubject(authentication.getName())
             .claim(AUTHORITIES_KEY, authorities)
+            .claim(DEPART_ID, currentUser.getDepartIds())
             .signWith(key, SignatureAlgorithm.HS512)
             .setExpiration(validity)
             .compact();
