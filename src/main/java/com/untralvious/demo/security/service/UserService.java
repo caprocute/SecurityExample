@@ -1,12 +1,8 @@
 package com.untralvious.demo.security.service;
 
 import com.untralvious.demo.security.config.Constants;
-import com.untralvious.demo.security.domain.Authority;
-import com.untralvious.demo.security.domain.SysUser;
-import com.untralvious.demo.security.domain.User;
-import com.untralvious.demo.security.repository.AuthorityRepository;
-import com.untralvious.demo.security.repository.SysUserRepository;
-import com.untralvious.demo.security.repository.UserRepository;
+import com.untralvious.demo.security.domain.*;
+import com.untralvious.demo.security.repository.*;
 import com.untralvious.demo.security.security.AuthoritiesConstants;
 import com.untralvious.demo.security.security.SecurityUtils;
 import com.untralvious.demo.security.service.dto.AdminUserDTO;
@@ -44,17 +40,24 @@ public class UserService {
     private final CacheManager cacheManager;
 
     private final SysUserRepository sysUserRepository;
+
+    private final SysRoleRepository sysRoleRepository;
+
+    private final SysUserRoleRepository sysUserRoleRepository;
+
     public UserService(
         UserRepository userRepository,
         PasswordEncoder passwordEncoder,
         AuthorityRepository authorityRepository,
         CacheManager cacheManager,
-        SysUserRepository sysUserRepository) {
+        SysUserRepository sysUserRepository, SysRoleRepository sysRoleRepository, SysUserRoleRepository sysUserRoleRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authorityRepository = authorityRepository;
         this.cacheManager = cacheManager;
         this.sysUserRepository = sysUserRepository;
+        this.sysRoleRepository = sysRoleRepository;
+        this.sysUserRoleRepository = sysUserRoleRepository;
     }
 
     public Optional<User> activateRegistration(String key) {
@@ -133,7 +136,12 @@ public class UserService {
         Set<Authority> authorities = new HashSet<>();
         authorityRepository.findById(AuthoritiesConstants.USER).ifPresent(authorities::add);
         //newUser.setAuthorities(authorities);
-        sysUserRepository.save(newUser);
+        SysUser savedUser = sysUserRepository.save(newUser);
+        SysRole sysRole =  sysRoleRepository.findOneByRoleCode("user").get();
+        SysUserRole sysUserRole = new SysUserRole();
+        sysUserRole.setUserId(savedUser.getId());
+        sysUserRole.setRoleId(sysRole.getId());
+        sysUserRoleRepository.save(sysUserRole);
         //this.clearUserCaches(newUser);
         log.debug("Created Information for User: {}", newUser);
         return newUser;

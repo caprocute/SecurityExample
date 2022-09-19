@@ -1,6 +1,10 @@
 package com.untralvious.demo.security.security.jwt;
 
+import com.untralvious.demo.security.domain.SysRole;
+import com.untralvious.demo.security.domain.SysUser;
 import com.untralvious.demo.security.management.SecurityMetersService;
+import com.untralvious.demo.security.repository.SysRoleRepository;
+import com.untralvious.demo.security.repository.SysUserRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -39,7 +43,12 @@ public class TokenProvider {
 
     private final SecurityMetersService securityMetersService;
 
-    public TokenProvider(JHipsterProperties jHipsterProperties, SecurityMetersService securityMetersService) {
+    private final SysUserRepository sysUserRepository;
+
+    private final SysRoleRepository sysRoleRepository;
+    public TokenProvider(JHipsterProperties jHipsterProperties, SecurityMetersService securityMetersService, SysUserRepository sysUserRepository, SysRoleRepository sysRoleRepository) {
+        this.sysUserRepository = sysUserRepository;
+        this.sysRoleRepository = sysRoleRepository;
         byte[] keyBytes;
         String secret = jHipsterProperties.getSecurity().getAuthentication().getJwt().getBase64Secret();
         if (!ObjectUtils.isEmpty(secret)) {
@@ -63,8 +72,10 @@ public class TokenProvider {
     }
 
     public String createToken(Authentication authentication, boolean rememberMe) {
-        String authorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(","));
-
+        //String authorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(","));
+        SysUser currentUser = sysUserRepository.findOneByLogin(authentication.getName()).get();
+        List<String> roleList =  sysRoleRepository.findAllRoleByUserId(currentUser.getId());
+        String authorities = roleList.stream().collect(Collectors.joining(","));
         long now = (new Date()).getTime();
         Date validity;
         if (rememberMe) {

@@ -1,5 +1,7 @@
 package com.untralvious.demo.security.domain;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.*;
 
 @Entity
@@ -11,6 +13,8 @@ public class SysUserRole {
 
     @Id
     @Column(name = "id", nullable = false, length = 32)
+    @GeneratedValue(generator="system-uuid")
+    @GenericGenerator(name="system-uuid", strategy = "uuid")
     public String getId() {
         return id;
     }
