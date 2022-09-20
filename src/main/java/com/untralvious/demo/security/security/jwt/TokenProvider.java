@@ -76,9 +76,9 @@ public class TokenProvider {
         this.securityMetersService = securityMetersService;
     }
 
-    public String createToken(Authentication authentication, boolean rememberMe) {
+    public String createToken(String username, boolean rememberMe) {
         //String authorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(","));
-        SysUser currentUser = sysUserRepository.findOneByLogin(authentication.getName()).get();
+        SysUser currentUser = sysUserRepository.findOneByLogin(username).get();
         List<String> roleList =  sysRoleRepository.findAllRoleByUserId(currentUser.getId());
         String authorities = roleList.stream().collect(Collectors.joining(","));
         long now = (new Date()).getTime();
@@ -90,7 +90,7 @@ public class TokenProvider {
         }
         String token = Jwts
             .builder()
-            .setSubject(authentication.getName())
+            .setSubject(username)
             .claim(AUTHORITIES_KEY, authorities)
             .claim(DEPART_ID, currentUser.getDepartIds())
             .signWith(key, SignatureAlgorithm.HS512)
@@ -117,9 +117,9 @@ public class TokenProvider {
     public boolean validateToken(String authToken) {
         Authentication authentication = getAuthentication(authToken);
 
-//        if(!redisService.checkValue(authentication.getName(), authToken)){
-//            return false;
-//        }
+        if(!redisService.checkValue(authentication.getName(), authToken)){
+            return false;
+        }
         try {
             jwtParser.parseClaimsJws(authToken);
 

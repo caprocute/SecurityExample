@@ -7,6 +7,7 @@ import com.untralvious.demo.security.security.jwt.JWTFilter;
 import com.untralvious.demo.security.security.jwt.TokenProvider;
 import com.untralvious.demo.security.service.RedisService;
 import com.untralvious.demo.security.service.UserService;
+import com.untralvious.demo.security.util.PasswordUtil;
 import com.untralvious.demo.security.web.rest.vm.LoginVM;
 
 import javax.servlet.http.HttpServletRequest;
@@ -50,10 +51,14 @@ public class UserJWTController {
             loginVM.getUsername(),
             loginVM.getPassword()
         );
-
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = tokenProvider.createToken(authentication, loginVM.isRememberMe());
+        SysUser sysUser = userService.getUserByLogin(loginVM.getUsername());
+        String endcodedPassword = PasswordUtil.encrypt(loginVM.getUsername(), loginVM.getPassword(), sysUser.getSalt());
+        if(!endcodedPassword.equals(sysUser.getPassword())){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+//        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+//        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = tokenProvider.createToken(loginVM.getUsername(), loginVM.isRememberMe());
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(JWTFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
         return new ResponseEntity<>(new JWTToken(jwt), httpHeaders, HttpStatus.OK);

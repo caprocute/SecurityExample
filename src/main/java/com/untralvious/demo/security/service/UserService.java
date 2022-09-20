@@ -11,6 +11,8 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import com.untralvious.demo.security.util.PasswordUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.CacheManager;
@@ -118,8 +120,11 @@ public class UserService {
                 }
             });
         SysUser newUser = new SysUser();
-        String encryptedPassword = passwordEncoder.encode(password);
+//        String encryptedPassword = passwordEncoder.encode(password);
+        String salt = PasswordUtil.randomGen(8);
+        String encryptedPassword = PasswordUtil.encrypt(userDTO.getLogin(), password, salt);
         newUser.setLogin(userDTO.getLogin().toLowerCase());
+        newUser.setSalt(salt);
         // new user gets initially a generated password
         newUser.setPassword(encryptedPassword);
         //newUser.setFirstName(userDTO.getFirstName());
