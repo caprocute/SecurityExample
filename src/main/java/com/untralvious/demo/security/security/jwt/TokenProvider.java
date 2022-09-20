@@ -1,10 +1,10 @@
 package com.untralvious.demo.security.security.jwt;
 
-import com.untralvious.demo.security.domain.SysRole;
 import com.untralvious.demo.security.domain.SysUser;
 import com.untralvious.demo.security.management.SecurityMetersService;
 import com.untralvious.demo.security.repository.SysRoleRepository;
 import com.untralvious.demo.security.repository.SysUserRepository;
+import com.untralvious.demo.security.service.RedisService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -47,9 +47,12 @@ public class TokenProvider {
 
     private final SysUserRepository sysUserRepository;
 
+    private final RedisService redisService;
+
     private final SysRoleRepository sysRoleRepository;
-    public TokenProvider(JHipsterProperties jHipsterProperties, SecurityMetersService securityMetersService, SysUserRepository sysUserRepository, SysRoleRepository sysRoleRepository) {
+    public TokenProvider(JHipsterProperties jHipsterProperties, SecurityMetersService securityMetersService, SysUserRepository sysUserRepository, RedisService redisService, SysRoleRepository sysRoleRepository) {
         this.sysUserRepository = sysUserRepository;
+        this.redisService = redisService;
         this.sysRoleRepository = sysRoleRepository;
         byte[] keyBytes;
         String secret = jHipsterProperties.getSecurity().getAuthentication().getJwt().getBase64Secret();
@@ -85,8 +88,7 @@ public class TokenProvider {
         } else {
             validity = new Date(now + this.tokenValidityInMilliseconds);
         }
-
-        return Jwts
+        String token = Jwts
             .builder()
             .setSubject(authentication.getName())
             .claim(AUTHORITIES_KEY, authorities)
@@ -94,6 +96,8 @@ public class TokenProvider {
             .signWith(key, SignatureAlgorithm.HS512)
             .setExpiration(validity)
             .compact();
+        redisService.setKeyValue(currentUser.getLogin(), token, rememberMe ? this.tokenValidityInMillisecondsForRememberMe : this.tokenValidityInMilliseconds);
+        return token;
     }
 
     public Authentication getAuthentication(String token) {
@@ -111,6 +115,11 @@ public class TokenProvider {
     }
 
     public boolean validateToken(String authToken) {
+        Authentication authentication = getAuthentication(authToken);
+
+//        if(!redisService.checkValue(authentication.getName(), authToken)){
+//            return false;
+//        }
         try {
             jwtParser.parseClaimsJws(authToken);
 

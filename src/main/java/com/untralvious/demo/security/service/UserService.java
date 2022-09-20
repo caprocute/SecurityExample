@@ -334,4 +334,12 @@ public class UserService {
             Objects.requireNonNull(cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE)).evict(user.getEmail());
         }
     }
+
+    public SysUser getUserByLogin(String login){
+        return sysUserRepository.findOneByLogin(login).get();
+    }
+
+    public SysUser getUserWithLogin() {
+        return sysUserRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin().get()).get();
+    }
 }
