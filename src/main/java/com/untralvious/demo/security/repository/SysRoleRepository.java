@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface SysRoleRepository extends JpaRepository<SysRole, Long> {
+public interface SysRoleRepository extends JpaRepository<SysRole, String> {
     Optional<SysRole> findOneByRoleCode(String roleCode);
 
     @Query(

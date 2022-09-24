@@ -16,7 +16,7 @@ import org.springframework.stereotype.Repository;
  * Spring Data JPA repository for the {@link SysUser} entity.
  */
 @Repository
-public interface SysUserRepository extends JpaRepository<SysUser, Long> {
+public interface SysUserRepository extends JpaRepository<SysUser, String> {
     String USERS_BY_LOGIN_CACHE = "usersByLogin";
 
     String USERS_BY_EMAIL_CACHE = "usersByEmail";
