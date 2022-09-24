@@ -26,17 +26,12 @@ public class AdminUserDTO implements Serializable {
     @Size(max = 50)
     private String firstName;
 
-    //    @Size(max = 50)
-    //    private String lastName;
-
     @Email
     @Size(min = 5, max = 254)
     private String email;
 
     @Size(max = 256)
     private String imageUrl;
-
-    //    private boolean activated = false;
 
     @Size(min = 2, max = 10)
     private String langKey;
@@ -59,11 +54,8 @@ public class AdminUserDTO implements Serializable {
         this.id = user.getId();
         this.login = user.getLogin();
         this.firstName = user.getRealName();
-        //        this.lastName = user.getLastName();
         this.email = user.getEmail();
-        //        this.activated = user.isActivated();
         this.imageUrl = user.getImageUrl();
-        //        this.langKey = user.getLangKey();
         this.createdBy = user.getCreatedBy();
         this.createdDate = user.getCreatedDate();
         this.lastModifiedBy = user.getLastModifiedBy();

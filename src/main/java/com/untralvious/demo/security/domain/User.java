@@ -47,34 +47,14 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @Column(name = "realname", length = 50)
     private String realName;
 
-    //    @Size(max = 50)
-    //    @Column(name = "last_name", length = 50)
-    //    private String lastName;
-
     @Email
     @Size(min = 5, max = 254)
     @Column(length = 254, unique = true)
     private String email;
 
-    //    @NotNull
-    //    @Column(nullable = false)
-    //    private boolean activated = false;
-    //
-    //    @Size(min = 2, max = 10)
-    //    @Column(name = "lang_key", length = 10)
-    //    private String langKey;
-
     @Size(max = 256)
     @Column(name = "avatar", length = 256)
     private String imageUrl;
-
-    //    @Size(max = 20)
-    //    @Column(name = "reset_key", length = 20)
-    //    @JsonIgnore
-    //    private String resetKey;
-    //
-    //    @Column(name = "reset_date")
-    //    private Instant resetDate = null;
 
     @JsonIgnore
     @ManyToMany
