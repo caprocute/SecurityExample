@@ -23,7 +23,7 @@ public abstract class AbstractAuditingEntity<T> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public abstract T getId();
+    public abstract String getId();
 
     @CreatedBy
     @Column(name = "create_by", nullable = false, length = 50, updatable = false)

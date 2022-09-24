@@ -65,7 +65,9 @@ public class UserService {
                 throw new EmailAlreadyUsedException();
             });
         User newUser = new User();
+        UUID uuid = UUID.randomUUID();
         String encryptedPassword = passwordEncoder.encode(password);
+        newUser.setId(uuid.toString().replace("-", ""));
         newUser.setLogin(userDTO.getLogin().toLowerCase());
         // new user gets initially a generated password
         newUser.setPassword(encryptedPassword);
@@ -200,7 +202,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public Page<UserDTO> getAllPublicUsers(Pageable pageable) {
-        return userRepository.findAllByIdNotNullAndActivatedIsTrue(pageable).map(UserDTO::new);
+        return userRepository.findAllByIdNotNull(pageable).map(UserDTO::new);
     }
 
     @Transactional(readOnly = true)

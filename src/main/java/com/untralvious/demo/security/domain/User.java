@@ -28,13 +28,12 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     @NotNull
     @Pattern(regexp = Constants.LOGIN_REGEX)
     @Size(min = 1, max = 50)
-    @Column(name = "userName", length = 50, unique = true, nullable = false)
+    @Column(name = "username", length = 50, unique = true, nullable = false)
     private String login;
 
     @JsonIgnore
@@ -67,11 +66,11 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @BatchSize(size = 20)
     private Set<Authority> authorities = new HashSet<>();
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
