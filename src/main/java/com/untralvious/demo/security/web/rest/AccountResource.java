@@ -1,11 +1,9 @@
 package com.untralvious.demo.security.web.rest;
 
-import com.untralvious.demo.security.domain.SysPermission;
-import com.untralvious.demo.security.domain.SysPermissionTree;
-import com.untralvious.demo.security.domain.SysUser;
-import com.untralvious.demo.security.domain.User;
+import com.untralvious.demo.security.domain.*;
 import com.untralvious.demo.security.repository.UserRepository;
 import com.untralvious.demo.security.security.SecurityUtils;
+import com.untralvious.demo.security.service.CtgGoodService;
 import com.untralvious.demo.security.service.MailService;
 import com.untralvious.demo.security.service.UserService;
 import com.untralvious.demo.security.service.dto.AdminUserDTO;
@@ -45,10 +43,13 @@ public class AccountResource {
 
     private final MailService mailService;
 
-    public AccountResource(UserRepository userRepository, UserService userService, MailService mailService) {
+    private final CtgGoodService ctgGoodService;
+
+    public AccountResource(UserRepository userRepository, UserService userService, MailService mailService, CtgGoodService ctgGoodService) {
         this.userRepository = userRepository;
         this.userService = userService;
         this.mailService = mailService;
+        this.ctgGoodService = ctgGoodService;
     }
 
     /**
@@ -195,12 +196,19 @@ public class AccountResource {
     }
 
     @GetMapping(path = "/account/permission")
-    public ResponseEntity<List<SysPermissionTree>>  getPermission(){
+    public ResponseEntity<List<SysPermissionTree>>  getAllPermission(){
         List<SysPermission> sysPermissionList = userService.getAllPermisson();
         List<SysPermissionTree> treeList = new ArrayList<>();
         getTreeList(treeList, sysPermissionList, null);
         return ResponseEntity.status(HttpStatus.OK).body(treeList);
     }
+
+    @GetMapping(path="/account/ctg-good")
+    public ResponseEntity<List<CtgGood>> getAllCtgGood(){
+        List<CtgGood> ctgGoodList = ctgGoodService.getAll();
+        return ResponseEntity.status(HttpStatus.OK).body(ctgGoodList);
+    }
+
 
     private void getTreeList(List<SysPermissionTree> treeList, List<SysPermission> metaList, SysPermissionTree temp) {
         for (SysPermission permission : metaList) {
