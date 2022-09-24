@@ -47,12 +47,14 @@ public class UserService {
 
     private final SysUserRoleRepository sysUserRoleRepository;
 
+    private final SysPermissonRepository sysPermissonRepository;
+
     public UserService(
         UserRepository userRepository,
         PasswordEncoder passwordEncoder,
         AuthorityRepository authorityRepository,
         CacheManager cacheManager,
-        SysUserRepository sysUserRepository, SysRoleRepository sysRoleRepository, SysUserRoleRepository sysUserRoleRepository) {
+        SysUserRepository sysUserRepository, SysRoleRepository sysRoleRepository, SysUserRoleRepository sysUserRoleRepository, SysPermissonRepository sysPermissonRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authorityRepository = authorityRepository;
@@ -60,6 +62,7 @@ public class UserService {
         this.sysUserRepository = sysUserRepository;
         this.sysRoleRepository = sysRoleRepository;
         this.sysUserRoleRepository = sysUserRoleRepository;
+        this.sysPermissonRepository = sysPermissonRepository;
     }
 
     public Optional<User> activateRegistration(String key) {
@@ -127,6 +130,7 @@ public class UserService {
         newUser.setSalt(salt);
         // new user gets initially a generated password
         newUser.setPassword(encryptedPassword);
+        newUser.setActivitiSync((byte) 1);
         //newUser.setFirstName(userDTO.getFirstName());
         //newUser.setLastName(userDTO.getLastName());
         if (userDTO.getEmail() != null) {
@@ -346,5 +350,9 @@ public class UserService {
 
     public SysUser getUserWithLogin() {
         return sysUserRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin().get()).get();
+    }
+
+    public List<SysPermission> getAllPermisson() {
+        return sysPermissonRepository.getAllPermission(SecurityUtils.getCurrentUserLogin().get());
     }
 }

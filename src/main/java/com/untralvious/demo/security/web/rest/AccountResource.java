@@ -1,5 +1,7 @@
 package com.untralvious.demo.security.web.rest;
 
+import com.untralvious.demo.security.domain.SysPermission;
+import com.untralvious.demo.security.domain.SysPermissionTree;
 import com.untralvious.demo.security.domain.SysUser;
 import com.untralvious.demo.security.domain.User;
 import com.untralvious.demo.security.repository.UserRepository;
@@ -18,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -189,5 +192,32 @@ public class AccountResource {
             password.length() < ManagedUserVM.PASSWORD_MIN_LENGTH ||
             password.length() > ManagedUserVM.PASSWORD_MAX_LENGTH
         );
+    }
+
+    @GetMapping(path = "/account/permission")
+    public ResponseEntity<List<SysPermissionTree>>  getPermission(){
+        List<SysPermission> sysPermissionList = userService.getAllPermisson();
+        List<SysPermissionTree> treeList = new ArrayList<>();
+        getTreeList(treeList, sysPermissionList, null);
+        return ResponseEntity.status(HttpStatus.OK).body(treeList);
+    }
+
+    private void getTreeList(List<SysPermissionTree> treeList, List<SysPermission> metaList, SysPermissionTree temp) {
+        for (SysPermission permission : metaList) {
+            String tempPid = permission.getParentId();
+            SysPermissionTree tree = new SysPermissionTree(permission);
+            if (temp == null && tempPid.isEmpty()) {
+                treeList.add(tree);
+                if (!tree.getIsLeaf()) {
+                    getTreeList(treeList, metaList, tree);
+                }
+            } else if (temp != null && tempPid != null && tempPid.equals(temp.getId())) {
+                temp.getChildren().add(tree);
+                if (!tree.getIsLeaf()) {
+                    getTreeList(treeList, metaList, tree);
+                }
+            }
+
+        }
     }
 }
