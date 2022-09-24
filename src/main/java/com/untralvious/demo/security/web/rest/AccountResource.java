@@ -62,7 +62,7 @@ public class AccountResource {
             throw new InvalidPasswordException();
         }
         User user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
-        mailService.sendActivationEmail(user);
+        //        mailService.sendActivationEmail(user);
     }
 
     /**
@@ -71,13 +71,13 @@ public class AccountResource {
      * @param key the activation key.
      * @throws RuntimeException {@code 500 (Internal Server Error)} if the user couldn't be activated.
      */
-    @GetMapping("/activate")
-    public void activateAccount(@RequestParam(value = "key") String key) {
-        Optional<User> user = userService.activateRegistration(key);
-        if (!user.isPresent()) {
-            throw new AccountResourceException("No user was found for this activation key");
-        }
-    }
+    //    @GetMapping("/activate")
+    //    public void activateAccount(@RequestParam(value = "key") String key) {
+    //        Optional<User> user = userService.activateRegistration(key);
+    //        if (!user.isPresent()) {
+    //            throw new AccountResourceException("No user was found for this activation key");
+    //        }
+    //    }
 
     /**
      * {@code GET  /authenticate} : check if the user is authenticated, and return its login.
@@ -125,13 +125,7 @@ public class AccountResource {
         if (!user.isPresent()) {
             throw new AccountResourceException("User could not be found");
         }
-        userService.updateUser(
-            userDTO.getFirstName(),
-            userDTO.getLastName(),
-            userDTO.getEmail(),
-            userDTO.getLangKey(),
-            userDTO.getImageUrl()
-        );
+        userService.updateUser(userDTO.getRealName(), userDTO.getEmail(), userDTO.getImageUrl());
     }
 
     /**
@@ -153,36 +147,36 @@ public class AccountResource {
      *
      * @param mail the mail of the user.
      */
-    @PostMapping(path = "/account/reset-password/init")
-    public void requestPasswordReset(@RequestBody String mail) {
-        Optional<User> user = userService.requestPasswordReset(mail);
-        if (user.isPresent()) {
-            mailService.sendPasswordResetMail(user.get());
-        } else {
-            // Pretend the request has been successful to prevent checking which emails really exist
-            // but log that an invalid attempt has been made
-            log.warn("Password reset requested for non existing mail");
-        }
-    }
+    //    @PostMapping(path = "/account/reset-password/init")
+    //    public void requestPasswordReset(@RequestBody String mail) {
+    //        Optional<User> user = userService.requestPasswordReset(mail);
+    //        if (user.isPresent()) {
+    //            mailService.sendPasswordResetMail(user.get());
+    //        } else {
+    //            // Pretend the request has been successful to prevent checking which emails really exist
+    //            // but log that an invalid attempt has been made
+    //            log.warn("Password reset requested for non existing mail");
+    //        }
+    //    }
 
     /**
      * {@code POST   /account/reset-password/finish} : Finish to reset the password of the user.
      *
-     * @param keyAndPassword the generated key and the new password.
+//     * @param keyAndPassword the generated key and the new password.
      * @throws InvalidPasswordException {@code 400 (Bad Request)} if the password is incorrect.
      * @throws RuntimeException {@code 500 (Internal Server Error)} if the password could not be reset.
      */
-    @PostMapping(path = "/account/reset-password/finish")
-    public void finishPasswordReset(@RequestBody KeyAndPasswordVM keyAndPassword) {
-        if (isPasswordLengthInvalid(keyAndPassword.getNewPassword())) {
-            throw new InvalidPasswordException();
-        }
-        Optional<User> user = userService.completePasswordReset(keyAndPassword.getNewPassword(), keyAndPassword.getKey());
-
-        if (!user.isPresent()) {
-            throw new AccountResourceException("No user was found for this reset key");
-        }
-    }
+    //    @PostMapping(path = "/account/reset-password/finish")
+    //    public void finishPasswordReset(@RequestBody KeyAndPasswordVM keyAndPassword) {
+    //        if (isPasswordLengthInvalid(keyAndPassword.getNewPassword())) {
+    //            throw new InvalidPasswordException();
+    //        }
+    //        Optional<User> user = userService.completePasswordReset(keyAndPassword.getNewPassword(), keyAndPassword.getKey());
+    //
+    //        if (!user.isPresent()) {
+    //            throw new AccountResourceException("No user was found for this reset key");
+    //        }
+    //    }
 
     private static boolean isPasswordLengthInvalid(String password) {
         return (

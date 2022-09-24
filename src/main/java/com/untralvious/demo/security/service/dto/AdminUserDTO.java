@@ -26,8 +26,8 @@ public class AdminUserDTO implements Serializable {
     @Size(max = 50)
     private String firstName;
 
-    @Size(max = 50)
-    private String lastName;
+    //    @Size(max = 50)
+    //    private String lastName;
 
     @Email
     @Size(min = 5, max = 254)
@@ -36,7 +36,7 @@ public class AdminUserDTO implements Serializable {
     @Size(max = 256)
     private String imageUrl;
 
-    private boolean activated = false;
+    //    private boolean activated = false;
 
     @Size(min = 2, max = 10)
     private String langKey;
@@ -58,12 +58,12 @@ public class AdminUserDTO implements Serializable {
     public AdminUserDTO(User user) {
         this.id = user.getId();
         this.login = user.getLogin();
-        this.firstName = user.getFirstName();
-        this.lastName = user.getLastName();
+        this.firstName = user.getRealName();
+        //        this.lastName = user.getLastName();
         this.email = user.getEmail();
-        this.activated = user.isActivated();
+        //        this.activated = user.isActivated();
         this.imageUrl = user.getImageUrl();
-        this.langKey = user.getLangKey();
+        //        this.langKey = user.getLangKey();
         this.createdBy = user.getCreatedBy();
         this.createdDate = user.getCreatedDate();
         this.lastModifiedBy = user.getLastModifiedBy();
@@ -87,20 +87,12 @@ public class AdminUserDTO implements Serializable {
         this.login = login;
     }
 
-    public String getFirstName() {
+    public String getRealName() {
         return firstName;
     }
 
-    public void setFirstName(String firstName) {
+    public void setRealName(String firstName) {
         this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
     }
 
     public String getEmail() {
@@ -117,22 +109,6 @@ public class AdminUserDTO implements Serializable {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
-    }
-
-    public boolean isActivated() {
-        return activated;
-    }
-
-    public void setActivated(boolean activated) {
-        this.activated = activated;
-    }
-
-    public String getLangKey() {
-        return langKey;
-    }
-
-    public void setLangKey(String langKey) {
-        this.langKey = langKey;
     }
 
     public String getCreatedBy() {
@@ -181,11 +157,8 @@ public class AdminUserDTO implements Serializable {
         return "AdminUserDTO{" +
             "login='" + login + '\'' +
             ", firstName='" + firstName + '\'' +
-            ", lastName='" + lastName + '\'' +
             ", email='" + email + '\'' +
             ", imageUrl='" + imageUrl + '\'' +
-            ", activated=" + activated +
-            ", langKey='" + langKey + '\'' +
             ", createdBy=" + createdBy +
             ", createdDate=" + createdDate +
             ", lastModifiedBy='" + lastModifiedBy + '\'' +
