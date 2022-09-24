@@ -1,10 +1,12 @@
 package com.untralvious.demo.security.domain;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "sys_log", schema = "securityexample", catalog = "")
+@Table(name = "sys_log", schema = "securityexample")
 public class SysLog {
     private String id;
     private Integer logType;
@@ -27,6 +29,8 @@ public class SysLog {
 
     @Id
     @Column(name = "id", nullable = false, length = 32)
+    @GeneratedValue(generator="system-uuid")
+    @GenericGenerator(name="system-uuid", strategy = "uuid")
     public String getId() {
         return id;
     }
@@ -191,12 +195,12 @@ public class SysLog {
         return responseCode;
     }
 
-    public void setResponseCode(String responseCode) {
-        this.responseCode = responseCode;
+    public void setResponseCode(int responseCode) {
+        this.responseCode = String.valueOf(responseCode);
     }
 
     @Basic
-    @Column(name = "response_content", nullable = true, length = 100)
+    @Column(name = "response_content", nullable = true, length = 1000)
     public String getResponseContent() {
         return responseContent;
     }
