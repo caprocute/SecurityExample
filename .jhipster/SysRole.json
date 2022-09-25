@@ -1,0 +1,12 @@
+{
+  "changelogDate": "20220925171337",
+  "dto": "mapstruct",
+  "fields": [],
+  "jpaMetamodelFiltering": false,
+  "name": "SysRole",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [],
+  "service": "serviceImpl",
+  "skipClient": true
+}

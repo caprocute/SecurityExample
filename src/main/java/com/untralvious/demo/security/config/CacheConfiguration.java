@@ -81,6 +81,8 @@ public class CacheConfiguration {
             createCache(cm, com.untralvious.demo.security.domain.User.class.getName(), jcacheConfiguration);
             createCache(cm, com.untralvious.demo.security.domain.Authority.class.getName(), jcacheConfiguration);
             createCache(cm, com.untralvious.demo.security.domain.User.class.getName() + ".authorities", jcacheConfiguration);
+            createCache(cm, com.untralvious.demo.security.domain.SysUserRole.class.getName(), jcacheConfiguration);
+            createCache(cm, com.untralvious.demo.security.domain.SysRole.class.getName(), jcacheConfiguration);
             // jhipster-needle-redis-add-entry
         };
     }
