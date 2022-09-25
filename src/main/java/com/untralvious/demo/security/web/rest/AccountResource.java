@@ -11,12 +11,19 @@ import com.untralvious.demo.security.service.dto.PasswordChangeDTO;
 import com.untralvious.demo.security.web.rest.errors.*;
 import com.untralvious.demo.security.web.rest.vm.KeyAndPasswordVM;
 import com.untralvious.demo.security.web.rest.vm.ManagedUserVM;
+
+import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
+import javax.persistence.Query;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -205,10 +212,38 @@ public class AccountResource {
 
     @GetMapping(path="/account/ctg-good")
     public ResponseEntity<List<CtgGood>> getAllCtgGood(){
-        List<CtgGood> ctgGoodList = ctgGoodService.getAll();
+        SysUser sysUser = userService.getUserWithLogin();
+        List<CtgGood> ctgGoodList = ctgGoodService.getAll(sysUser.getDepartIds() != null ? sysUser.getDepartIds() : "");
         return ResponseEntity.status(HttpStatus.OK).body(ctgGoodList);
     }
 
+    @GetMapping(path="/account/ctg-good-paging")
+    public Page<CtgGood> getAllCtgGoodPaging(Pageable pageable){
+        SysUser sysUser = userService.getUserWithLogin();
+        Query ctgGoodListQuery = ctgGoodService.createListQuery(sysUser.getDepartIds() != null ? sysUser.getDepartIds() : "", pageable);
+        Query ctgGoodCountQuery = ctgGoodService.createCountQuery(sysUser.getDepartIds() != null ? sysUser.getDepartIds() : "");
+        int[] listOfNumbers = new int[]{1, 2};
+        List<Object> confSummaries = Arrays.stream(listOfNumbers).parallel().mapToObj(f -> runSQL(f, ctgGoodListQuery, ctgGoodCountQuery)).collect(Collectors.toList());
+        List<CtgGood> ctgGoodList = (List<CtgGood>) confSummaries.get(0);
+        Long count = (Long) confSummaries.get(1);
+        Page<CtgGood> result = new PageImpl<>(ctgGoodList, pageable, count);
+        return result;
+    }
+
+    private Object runSQL(int f, Query ctgGoodListQuery, Query ctgGoodCountQuery) {
+        if(f==1){
+            log.debug("Start run query list in :  {}", System.currentTimeMillis());
+            List<CtgGood>  ctgGoodList  = ctgGoodListQuery.getResultList();
+            log.debug("Finish run query list in :  {}", System.currentTimeMillis());
+            return ctgGoodList;
+        } else {
+            log.debug("Start run query count in :  {}", System.currentTimeMillis());
+            Long count =  ((BigInteger) ctgGoodCountQuery.getSingleResult()).longValue();
+            log.debug("Finish run query count in :  {}", System.currentTimeMillis());
+            return count;
+        }
+
+    }
 
     private void getTreeList(List<SysPermissionTree> treeList, List<SysPermission> metaList, SysPermissionTree temp) {
         for (SysPermission permission : metaList) {
