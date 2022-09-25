@@ -4,6 +4,7 @@ import java.io.Serializable;
 import javax.persistence.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.GenericGenerator;
 
 /**
  * A SysUserRole.
@@ -17,23 +18,52 @@ public class SysUserRole implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+    @GenericGenerator(name = "uuid", strategy = "com.untralvious.demo.security.service.IdGenerator")
+    @GeneratedValue(generator = "uuid")
+    private String id;
 
-    // jhipster-needle-entity-add-field - JHipster will add fields here
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    User user;
 
-    public Long getId() {
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    SysRole role;
+
+    public SysUserRole() {}
+
+    public SysUserRole(User user, SysRole role) {
+        this.user = user;
+        this.role = role;
+    }
+
+    public String getId() {
         return this.id;
     }
 
-    public SysUserRole id(Long id) {
+    public SysUserRole id(String id) {
         this.setId(id);
         return this;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public SysRole getRole() {
+        return role;
+    }
+
+    public void setRole(SysRole role) {
+        this.role = role;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

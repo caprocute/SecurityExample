@@ -1,13 +1,18 @@
 package com.untralvious.demo.security.service.impl;
 
 import com.untralvious.demo.security.domain.SysRole;
+import com.untralvious.demo.security.domain.SysUserRole;
 import com.untralvious.demo.security.repository.SysRoleRepository;
 import com.untralvious.demo.security.service.SysRoleService;
+import com.untralvious.demo.security.service.SysUserRoleService;
 import com.untralvious.demo.security.service.dto.SysRoleDTO;
 import com.untralvious.demo.security.service.mapper.SysRoleMapper;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,6 +30,9 @@ public class SysRoleServiceImpl implements SysRoleService {
     private final SysRoleRepository sysRoleRepository;
 
     private final SysRoleMapper sysRoleMapper;
+
+    @Autowired
+    private SysUserRoleService sysUserRoleService;
 
     public SysRoleServiceImpl(SysRoleRepository sysRoleRepository, SysRoleMapper sysRoleMapper) {
         this.sysRoleRepository = sysRoleRepository;
@@ -70,14 +78,34 @@ public class SysRoleServiceImpl implements SysRoleService {
     }
 
     @Override
+    public List<SysRoleDTO> findAllNotPaging() {
+        return sysRoleRepository.findAll().stream().map(sysRoleMapper::toDto).collect(Collectors.toList());
+    }
+
+    @Override
     @Transactional(readOnly = true)
-    public Optional<SysRoleDTO> findOne(Long id) {
+    public Optional<SysRoleDTO> findOne(String id) {
         log.debug("Request to get SysRole : {}", id);
         return sysRoleRepository.findById(id).map(sysRoleMapper::toDto);
     }
 
     @Override
-    public void delete(Long id) {
+    public Optional<SysRole> findOneByCode(String code) {
+        return sysRoleRepository.findByRoleCode(code);
+    }
+
+    @Override
+    public List<SysRole> getRolesById(List<String> roleIds) {
+        return sysRoleRepository.findByIdIn(roleIds);
+    }
+
+    @Override
+    public List<SysRole> getRoles(String userId) {
+        return null;
+    }
+
+    @Override
+    public void delete(String id) {
         log.debug("Request to delete SysRole : {}", id);
         sysRoleRepository.deleteById(id);
     }

@@ -78,7 +78,7 @@ public class SysUserRoleResource {
      */
     @PutMapping("/sys-user-roles/{id}")
     public ResponseEntity<SysUserRoleDTO> updateSysUserRole(
-        @PathVariable(value = "id", required = false) final Long id,
+        @PathVariable(value = "id", required = false) final String id,
         @RequestBody SysUserRoleDTO sysUserRoleDTO
     ) throws URISyntaxException {
         log.debug("REST request to update SysUserRole : {}, {}", id, sysUserRoleDTO);
@@ -113,7 +113,7 @@ public class SysUserRoleResource {
      */
     @PatchMapping(value = "/sys-user-roles/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<SysUserRoleDTO> partialUpdateSysUserRole(
-        @PathVariable(value = "id", required = false) final Long id,
+        @PathVariable(value = "id", required = false) final String id,
         @RequestBody SysUserRoleDTO sysUserRoleDTO
     ) throws URISyntaxException {
         log.debug("REST request to partial update SysUserRole partially : {}, {}", id, sysUserRoleDTO);
@@ -157,7 +157,7 @@ public class SysUserRoleResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the sysUserRoleDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/sys-user-roles/{id}")
-    public ResponseEntity<SysUserRoleDTO> getSysUserRole(@PathVariable Long id) {
+    public ResponseEntity<SysUserRoleDTO> getSysUserRole(@PathVariable String id) {
         log.debug("REST request to get SysUserRole : {}", id);
         Optional<SysUserRoleDTO> sysUserRoleDTO = sysUserRoleService.findOne(id);
         return ResponseUtil.wrapOrNotFound(sysUserRoleDTO);
@@ -170,7 +170,7 @@ public class SysUserRoleResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/sys-user-roles/{id}")
-    public ResponseEntity<Void> deleteSysUserRole(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteSysUserRole(@PathVariable String id) {
         log.debug("REST request to delete SysUserRole : {}", id);
         sysUserRoleService.delete(id);
         return ResponseEntity

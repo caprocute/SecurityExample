@@ -78,7 +78,7 @@ public class SysRoleResource {
      */
     @PutMapping("/sys-roles/{id}")
     public ResponseEntity<SysRoleDTO> updateSysRole(
-        @PathVariable(value = "id", required = false) final Long id,
+        @PathVariable(value = "id", required = false) final String id,
         @RequestBody SysRoleDTO sysRoleDTO
     ) throws URISyntaxException {
         log.debug("REST request to update SysRole : {}, {}", id, sysRoleDTO);
@@ -113,7 +113,7 @@ public class SysRoleResource {
      */
     @PatchMapping(value = "/sys-roles/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<SysRoleDTO> partialUpdateSysRole(
-        @PathVariable(value = "id", required = false) final Long id,
+        @PathVariable(value = "id", required = false) final String id,
         @RequestBody SysRoleDTO sysRoleDTO
     ) throws URISyntaxException {
         log.debug("REST request to partial update SysRole partially : {}, {}", id, sysRoleDTO);
@@ -157,7 +157,7 @@ public class SysRoleResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the sysRoleDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/sys-roles/{id}")
-    public ResponseEntity<SysRoleDTO> getSysRole(@PathVariable Long id) {
+    public ResponseEntity<SysRoleDTO> getSysRole(@PathVariable String id) {
         log.debug("REST request to get SysRole : {}", id);
         Optional<SysRoleDTO> sysRoleDTO = sysRoleService.findOne(id);
         return ResponseUtil.wrapOrNotFound(sysRoleDTO);
@@ -170,7 +170,7 @@ public class SysRoleResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/sys-roles/{id}")
-    public ResponseEntity<Void> deleteSysRole(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteSysRole(@PathVariable String id) {
         log.debug("REST request to delete SysRole : {}", id);
         sysRoleService.delete(id);
         return ResponseEntity

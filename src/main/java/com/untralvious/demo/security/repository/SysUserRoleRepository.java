@@ -1,6 +1,7 @@
 package com.untralvious.demo.security.repository;
 
 import com.untralvious.demo.security.domain.SysUserRole;
+import java.util.List;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 
@@ -9,4 +10,6 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface SysUserRoleRepository extends JpaRepository<SysUserRole, Long> {}
+public interface SysUserRoleRepository extends JpaRepository<SysUserRole, String> {
+    List<SysUserRole> findByUserId(String userId);
+}

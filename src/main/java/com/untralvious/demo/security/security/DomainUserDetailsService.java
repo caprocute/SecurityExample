@@ -1,6 +1,8 @@
 package com.untralvious.demo.security.security;
 
 import com.untralvious.demo.security.domain.Authority;
+import com.untralvious.demo.security.domain.SysRole;
+import com.untralvious.demo.security.domain.SysUserRole;
 import com.untralvious.demo.security.domain.User;
 import com.untralvious.demo.security.repository.UserRepository;
 import java.util.*;
@@ -44,16 +46,17 @@ public class DomainUserDetailsService implements UserDetailsService {
 
         String lowercaseLogin = login.toLowerCase(Locale.ENGLISH);
         return userRepository
-            .findOneWithAuthoritiesByLogin(lowercaseLogin)
+            .findOneByLogin(lowercaseLogin)
             .map(user -> createSpringSecurityUser(lowercaseLogin, user))
             .orElseThrow(() -> new UsernameNotFoundException("User " + lowercaseLogin + " was not found in the database"));
     }
 
     private org.springframework.security.core.userdetails.User createSpringSecurityUser(String lowercaseLogin, User user) {
         List<GrantedAuthority> grantedAuthorities = user
-            .getAuthorities()
+            .getSysUserRoles()
             .stream()
-            .map(Authority::getName)
+            .map(SysUserRole::getRole)
+            .map(SysRole::getRoleCode)
             .map(SimpleGrantedAuthority::new)
             .collect(Collectors.toList());
         return new org.springframework.security.core.userdetails.User(user.getLogin(), user.getPassword(), grantedAuthorities);

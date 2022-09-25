@@ -2,12 +2,17 @@ package com.untralvious.demo.security.service;
 
 import com.untralvious.demo.security.config.Constants;
 import com.untralvious.demo.security.domain.Authority;
+import com.untralvious.demo.security.domain.SysRole;
+import com.untralvious.demo.security.domain.SysUserRole;
 import com.untralvious.demo.security.domain.User;
 import com.untralvious.demo.security.repository.AuthorityRepository;
+import com.untralvious.demo.security.repository.SysRoleRepository;
+import com.untralvious.demo.security.repository.SysUserRoleRepository;
 import com.untralvious.demo.security.repository.UserRepository;
 import com.untralvious.demo.security.security.AuthoritiesConstants;
 import com.untralvious.demo.security.security.SecurityUtils;
 import com.untralvious.demo.security.service.dto.AdminUserDTO;
+import com.untralvious.demo.security.service.dto.SysRoleDTO;
 import com.untralvious.demo.security.service.dto.UserDTO;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -15,6 +20,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,6 +47,15 @@ public class UserService {
 
     private final CacheManager cacheManager;
 
+    @Autowired
+    private SysUserRoleService sysUserRoleService;
+
+    @Autowired
+    private SysRoleService sysRoleService;
+
+    @Autowired
+    private SysUserRoleRepository sysUserRoleRepository;
+
     public UserService(
         UserRepository userRepository,
         PasswordEncoder passwordEncoder,
@@ -65,9 +80,7 @@ public class UserService {
                 throw new EmailAlreadyUsedException();
             });
         User newUser = new User();
-        UUID uuid = UUID.randomUUID();
         String encryptedPassword = passwordEncoder.encode(password);
-        //        newUser.setId(uuid.toString().replace("-", ""));
         newUser.setLogin(userDTO.getLogin().toLowerCase());
         // new user gets initially a generated password
         newUser.setPassword(encryptedPassword);
@@ -76,75 +89,77 @@ public class UserService {
             newUser.setEmail(userDTO.getEmail().toLowerCase());
         }
         newUser.setImageUrl(userDTO.getImageUrl());
-        Set<Authority> authorities = new HashSet<>();
-        authorityRepository.findById(AuthoritiesConstants.USER).ifPresent(authorities::add);
-        newUser.setAuthorities(authorities);
-        userRepository.save(newUser);
+        //        Set<Authority> authorities = new HashSet<>();
+        //        authorityRepository.findById(AuthoritiesConstants.USER).ifPresent(authorities::add);
+        //        newUser.setAuthorities(authorities);
+        SysRole sysRole = sysRoleService.findOneByCode(AuthoritiesConstants.SYS_ADMIN).orElseThrow();
+        User createdUser = userRepository.save(newUser);
+        sysUserRoleRepository.save(new SysUserRole(createdUser, sysRole));
         this.clearUserCaches(newUser);
         log.debug("Created Information for User: {}", newUser);
         return newUser;
     }
 
-    public User createUser(AdminUserDTO userDTO) {
-        User user = new User();
-        user.setLogin(userDTO.getLogin().toLowerCase());
-        user.setRealName(userDTO.getRealName());
-        if (userDTO.getEmail() != null) {
-            user.setEmail(userDTO.getEmail().toLowerCase());
-        }
-        user.setImageUrl(userDTO.getImageUrl());
-        String encryptedPassword = passwordEncoder.encode(RandomUtil.generatePassword());
-        user.setPassword(encryptedPassword);
-        if (userDTO.getAuthorities() != null) {
-            Set<Authority> authorities = userDTO
-                .getAuthorities()
-                .stream()
-                .map(authorityRepository::findById)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toSet());
-            user.setAuthorities(authorities);
-        }
-        userRepository.save(user);
-        this.clearUserCaches(user);
-        log.debug("Created Information for User: {}", user);
-        return user;
-    }
+    //    public User createUser(AdminUserDTO userDTO) {
+    //        User user = new User();
+    //        user.setLogin(userDTO.getLogin().toLowerCase());
+    //        user.setRealName(userDTO.getRealName());
+    //        if (userDTO.getEmail() != null) {
+    //            user.setEmail(userDTO.getEmail().toLowerCase());
+    //        }
+    //        user.setImageUrl(userDTO.getImageUrl());
+    //        String encryptedPassword = passwordEncoder.encode(RandomUtil.generatePassword());
+    //        user.setPassword(encryptedPassword);
+    //        if (userDTO.getAuthorities() != null) {
+    //            Set<Authority> authorities = userDTO
+    //                .getAuthorities()
+    //                .stream()
+    //                .map(authorityRepository::findById)
+    //                .filter(Optional::isPresent)
+    //                .map(Optional::get)
+    //                .collect(Collectors.toSet());
+    //            user.setAuthorities(authorities);
+    //        }
+    //        userRepository.save(user);
+    //        this.clearUserCaches(user);
+    //        log.debug("Created Information for User: {}", user);
+    //        return user;
+    //    }
 
     /**
      * Update all information for a specific user, and return the modified user.
      *
-     * @param userDTO user to update.
+//     * @param userDTO user to update.
      * @return updated user.
      */
-    public Optional<AdminUserDTO> updateUser(AdminUserDTO userDTO) {
-        return Optional
-            .of(userRepository.findById(userDTO.getId()))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .map(user -> {
-                this.clearUserCaches(user);
-                user.setLogin(userDTO.getLogin().toLowerCase());
-                user.setRealName(userDTO.getRealName());
-                if (userDTO.getEmail() != null) {
-                    user.setEmail(userDTO.getEmail().toLowerCase());
-                }
-                user.setImageUrl(userDTO.getImageUrl());
-                Set<Authority> managedAuthorities = user.getAuthorities();
-                managedAuthorities.clear();
-                userDTO
-                    .getAuthorities()
-                    .stream()
-                    .map(authorityRepository::findById)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .forEach(managedAuthorities::add);
-                this.clearUserCaches(user);
-                log.debug("Changed Information for User: {}", user);
-                return user;
-            })
-            .map(AdminUserDTO::new);
-    }
+    //    public Optional<AdminUserDTO> updateUser(AdminUserDTO userDTO) {
+    //        return Optional
+    //            .of(userRepository.findById(userDTO.getId()))
+    //            .filter(Optional::isPresent)
+    //            .map(Optional::get)
+    //            .map(user -> {
+    //                this.clearUserCaches(user);
+    //                user.setLogin(userDTO.getLogin().toLowerCase());
+    //                user.setRealName(userDTO.getRealName());
+    //                if (userDTO.getEmail() != null) {
+    //                    user.setEmail(userDTO.getEmail().toLowerCase());
+    //                }
+    //                user.setImageUrl(userDTO.getImageUrl());
+    //                Set<Authority> managedAuthorities = user.getAuthorities();
+    //                managedAuthorities.clear();
+    //                userDTO
+    //                    .getAuthorities()
+    //                    .stream()
+    //                    .map(authorityRepository::findById)
+    //                    .filter(Optional::isPresent)
+    //                    .map(Optional::get)
+    //                    .forEach(managedAuthorities::add);
+    //                this.clearUserCaches(user);
+    //                log.debug("Changed Information for User: {}", user);
+    //                return user;
+    //            })
+    //            .map(AdminUserDTO::new);
+    //    }
 
     public void deleteUser(String login) {
         userRepository
@@ -212,7 +227,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public Optional<User> getUserWithAuthorities() {
-        return SecurityUtils.getCurrentUserLogin().flatMap(userRepository::findOneWithAuthoritiesByLogin);
+        return SecurityUtils.getCurrentUserLogin().flatMap(userRepository::findOneByLogin);
     }
 
     /**
@@ -221,7 +236,8 @@ public class UserService {
      */
     @Transactional(readOnly = true)
     public List<String> getAuthorities() {
-        return authorityRepository.findAll().stream().map(Authority::getName).collect(Collectors.toList());
+        return sysRoleService.findAllNotPaging().stream().map(SysRoleDTO::getRoleCode).collect(Collectors.toList());
+        //        return authorityRepository.findAll().stream().map(Authority::getName).collect(Collectors.toList());
     }
 
     private void clearUserCaches(User user) {

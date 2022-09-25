@@ -24,7 +24,7 @@ import org.hibernate.annotations.GenericGenerator;
 @Entity
 @Table(name = "sys_user")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-public class User extends AbstractAuditingEntity<Long> implements Serializable {
+public class User extends AbstractAuditingEntity<String> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -58,16 +58,19 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @Column(name = "avatar", length = 256)
     private String imageUrl;
 
-    @JsonIgnore
-    @ManyToMany
-    @JoinTable(
-        name = "jhi_user_authority",
-        joinColumns = { @JoinColumn(name = "user_id", referencedColumnName = "id") },
-        inverseJoinColumns = { @JoinColumn(name = "authority_name", referencedColumnName = "name") }
-    )
-    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    @BatchSize(size = 20)
-    private Set<Authority> authorities = new HashSet<>();
+    //    @JsonIgnore
+    //    @ManyToMany
+    //    @JoinTable(
+    //        name = "jhi_user_authority",
+    //        joinColumns = { @JoinColumn(name = "user_id", referencedColumnName = "id") },
+    //        inverseJoinColumns = { @JoinColumn(name = "authority_name", referencedColumnName = "name") }
+    //    )
+    //    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    //    @BatchSize(size = 20)
+    //    private Set<Authority> authorities = new HashSet<>();
+
+    @OneToMany(mappedBy = "user")
+    Set<SysUserRole> sysUserRoles;
 
     public String getId() {
         return id;
@@ -118,12 +121,20 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
         this.imageUrl = imageUrl;
     }
 
-    public Set<Authority> getAuthorities() {
-        return authorities;
+    //    public Set<Authority> getAuthorities() {
+    //        return authorities;
+    //    }
+    //
+    //    public void setAuthorities(Set<Authority> authorities) {
+    //        this.authorities = authorities;
+    //    }
+
+    public Set<SysUserRole> getSysUserRoles() {
+        return sysUserRoles;
     }
 
-    public void setAuthorities(Set<Authority> authorities) {
-        this.authorities = authorities;
+    public void setSysUserRoles(Set<SysUserRole> sysUserRoles) {
+        this.sysUserRoles = sysUserRoles;
     }
 
     @Override

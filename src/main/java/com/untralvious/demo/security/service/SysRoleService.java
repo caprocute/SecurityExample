@@ -1,6 +1,9 @@
 package com.untralvious.demo.security.service;
 
+import com.untralvious.demo.security.domain.SysRole;
+import com.untralvious.demo.security.domain.SysUserRole;
 import com.untralvious.demo.security.service.dto.SysRoleDTO;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,18 +44,26 @@ public interface SysRoleService {
      */
     Page<SysRoleDTO> findAll(Pageable pageable);
 
+    List<SysRoleDTO> findAllNotPaging();
+
     /**
      * Get the "id" sysRole.
      *
      * @param id the id of the entity.
      * @return the entity.
      */
-    Optional<SysRoleDTO> findOne(Long id);
+    Optional<SysRoleDTO> findOne(String id);
+
+    Optional<SysRole> findOneByCode(String code);
+
+    List<SysRole> getRolesById(List<String> roleIds);
+
+    List<SysRole> getRoles(String userId);
 
     /**
      * Delete the "id" sysRole.
      *
      * @param id the id of the entity.
      */
-    void delete(Long id);
+    void delete(String id);
 }

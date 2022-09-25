@@ -5,6 +5,7 @@ import com.untralvious.demo.security.repository.SysUserRoleRepository;
 import com.untralvious.demo.security.service.SysUserRoleService;
 import com.untralvious.demo.security.service.dto.SysUserRoleDTO;
 import com.untralvious.demo.security.service.mapper.SysUserRoleMapper;
+import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,13 +72,18 @@ public class SysUserRoleServiceImpl implements SysUserRoleService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<SysUserRoleDTO> findOne(Long id) {
+    public Optional<SysUserRoleDTO> findOne(String id) {
         log.debug("Request to get SysUserRole : {}", id);
         return sysUserRoleRepository.findById(id).map(sysUserRoleMapper::toDto);
     }
 
     @Override
-    public void delete(Long id) {
+    public List<SysUserRole> getByUserId(String userId) {
+        return sysUserRoleRepository.findByUserId(userId);
+    }
+
+    @Override
+    public void delete(String id) {
         log.debug("Request to delete SysUserRole : {}", id);
         sysUserRoleRepository.deleteById(id);
     }
