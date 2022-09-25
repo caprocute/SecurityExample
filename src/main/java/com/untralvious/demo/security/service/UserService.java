@@ -67,7 +67,7 @@ public class UserService {
         User newUser = new User();
         UUID uuid = UUID.randomUUID();
         String encryptedPassword = passwordEncoder.encode(password);
-        newUser.setId(uuid.toString().replace("-", ""));
+        //        newUser.setId(uuid.toString().replace("-", ""));
         newUser.setLogin(userDTO.getLogin().toLowerCase());
         // new user gets initially a generated password
         newUser.setPassword(encryptedPassword);

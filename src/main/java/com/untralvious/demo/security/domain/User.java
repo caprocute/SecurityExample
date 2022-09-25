@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.GenericGenerator;
 
 /**
  * A user.
@@ -28,6 +29,8 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
+    @GenericGenerator(name = "uuid", strategy = "com.untralvious.demo.security.service.IdGenerator")
+    @GeneratedValue(generator = "uuid")
     private String id;
 
     @NotNull
