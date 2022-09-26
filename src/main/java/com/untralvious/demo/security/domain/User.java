@@ -22,11 +22,14 @@ import org.hibernate.annotations.GenericGenerator;
  * A user.
  */
 @Entity
-@Table(name = "sys_user")
+@Table(name = "sys_user", schema = "securityexample", catalog = "")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class User extends AbstractAuditingEntity<String> implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    @OneToMany(mappedBy = "user")
+    Set<SysUserRole> sysUserRoles;
 
     @Id
     @GenericGenerator(name = "uuid", strategy = "com.untralvious.demo.security.service.IdGenerator")
@@ -54,10 +57,6 @@ public class User extends AbstractAuditingEntity<String> implements Serializable
     @Column(length = 254, unique = true)
     private String email;
 
-    @Size(max = 256)
-    @Column(name = "avatar", length = 256)
-    private String imageUrl;
-
     //    @JsonIgnore
     //    @ManyToMany
     //    @JoinTable(
@@ -68,9 +67,11 @@ public class User extends AbstractAuditingEntity<String> implements Serializable
     //    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     //    @BatchSize(size = 20)
     //    private Set<Authority> authorities = new HashSet<>();
+    @Size(max = 256)
+    @Column(name = "avatar", length = 256)
+    private String imageUrl;
 
-    @OneToMany(mappedBy = "user")
-    Set<SysUserRole> sysUserRoles;
+    private String salt;
 
     public String getId() {
         return id;
@@ -117,10 +118,6 @@ public class User extends AbstractAuditingEntity<String> implements Serializable
         return imageUrl;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
     //    public Set<Authority> getAuthorities() {
     //        return authorities;
     //    }
@@ -128,6 +125,10 @@ public class User extends AbstractAuditingEntity<String> implements Serializable
     //    public void setAuthorities(Set<Authority> authorities) {
     //        this.authorities = authorities;
     //    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 
     public Set<SysUserRole> getSysUserRoles() {
         return sysUserRoles;
@@ -163,5 +164,15 @@ public class User extends AbstractAuditingEntity<String> implements Serializable
             ", email='" + email + '\'' +
             ", imageUrl='" + imageUrl + '\'' +
             "}";
+    }
+
+    @Basic
+    @Column(name = "salt")
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
     }
 }

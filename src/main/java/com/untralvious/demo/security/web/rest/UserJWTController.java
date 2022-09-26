@@ -3,8 +3,10 @@ package com.untralvious.demo.security.web.rest;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.untralvious.demo.security.security.jwt.JWTFilter;
 import com.untralvious.demo.security.security.jwt.TokenProvider;
+import com.untralvious.demo.security.service.UserService;
 import com.untralvious.demo.security.web.rest.vm.LoginVM;
 import javax.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +27,9 @@ public class UserJWTController {
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
+    @Autowired
+    private UserService userService;
+
     public UserJWTController(TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder) {
         this.tokenProvider = tokenProvider;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
@@ -32,9 +37,10 @@ public class UserJWTController {
 
     @PostMapping("/authenticate")
     public ResponseEntity<JWTToken> authorize(@Valid @RequestBody LoginVM loginVM) {
+        String salt = userService.getSaltByLogin(loginVM.getUsername());
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
             loginVM.getUsername(),
-            loginVM.getPassword()
+            loginVM.getPassword() + salt
         );
 
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);

@@ -25,6 +25,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -80,10 +81,12 @@ public class UserService {
                 throw new EmailAlreadyUsedException();
             });
         User newUser = new User();
-        String encryptedPassword = passwordEncoder.encode(password);
+        String newSalt = BCrypt.gensalt();
+        String encryptedPassword = passwordEncoder.encode(password + newSalt);
         newUser.setLogin(userDTO.getLogin().toLowerCase());
         // new user gets initially a generated password
         newUser.setPassword(encryptedPassword);
+        newUser.setSalt(newSalt);
         newUser.setRealName(userDTO.getRealName());
         if (userDTO.getEmail() != null) {
             newUser.setEmail(userDTO.getEmail().toLowerCase());
@@ -169,6 +172,11 @@ public class UserService {
                 this.clearUserCaches(user);
                 log.debug("Deleted User: {}", user);
             });
+    }
+
+    @Transactional(readOnly = true)
+    public String getSaltByLogin(String login) {
+        return userRepository.findOneByLogin(login).orElseThrow().getSalt();
     }
 
     /**
