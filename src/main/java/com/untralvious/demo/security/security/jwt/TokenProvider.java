@@ -9,8 +9,10 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.*;
 import java.util.stream.Collectors;
+import javax.cache.CacheManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -38,6 +40,9 @@ public class TokenProvider {
     private final long tokenValidityInMillisecondsForRememberMe;
 
     private final SecurityMetersService securityMetersService;
+
+    @Autowired
+    private CacheManager cm;
 
     public TokenProvider(JHipsterProperties jHipsterProperties, SecurityMetersService securityMetersService) {
         byte[] keyBytes;
@@ -82,7 +87,7 @@ public class TokenProvider {
             .compact();
     }
 
-    public Authentication getAuthentication(String token) {
+    private User getUserFromToken(String token) {
         Claims claims = jwtParser.parseClaimsJws(token).getBody();
 
         Collection<? extends GrantedAuthority> authorities = Arrays
@@ -91,16 +96,28 @@ public class TokenProvider {
             .map(SimpleGrantedAuthority::new)
             .collect(Collectors.toList());
 
-        User principal = new User(claims.getSubject(), "", authorities);
+        return new User(claims.getSubject(), "", authorities);
+    }
 
-        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+    public Authentication getAuthentication(String token) {
+        User principal = getUserFromToken(token);
+        return new UsernamePasswordAuthenticationToken(principal, token, principal.getAuthorities());
     }
 
     public boolean validateToken(String authToken) {
         try {
-            jwtParser.parseClaimsJws(authToken);
-
-            return true;
+            if (cm.getCache("jwtvault") != null) {
+                User user = getUserFromToken(authToken);
+                Object o = cm.getCache("jwtvault").get(user.getUsername());
+                if (o != null) {
+                    System.out.println(o + "---" + authToken);
+                    return o.toString().equals(authToken);
+                }
+            }
+            return false;
+            //            jwtParser.parseClaimsJws(authToken);
+            //
+            //            return true;
         } catch (ExpiredJwtException e) {
             this.securityMetersService.trackTokenExpired();
 

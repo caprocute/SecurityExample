@@ -76,6 +76,7 @@ public class CacheConfiguration {
     @Bean
     public JCacheManagerCustomizer cacheManagerCustomizer(javax.cache.configuration.Configuration<Object, Object> jcacheConfiguration) {
         return cm -> {
+            createCache(cm, "jwtvault", jcacheConfiguration);
             createCache(cm, com.untralvious.demo.security.repository.UserRepository.USERS_BY_LOGIN_CACHE, jcacheConfiguration);
             createCache(cm, com.untralvious.demo.security.repository.UserRepository.USERS_BY_EMAIL_CACHE, jcacheConfiguration);
             createCache(cm, com.untralvious.demo.security.domain.User.class.getName(), jcacheConfiguration);

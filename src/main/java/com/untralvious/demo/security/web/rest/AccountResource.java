@@ -11,11 +11,13 @@ import com.untralvious.demo.security.web.rest.errors.*;
 import com.untralvious.demo.security.web.rest.vm.KeyAndPasswordVM;
 import com.untralvious.demo.security.web.rest.vm.ManagedUserVM;
 import java.util.*;
+import javax.cache.CacheManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,6 +43,9 @@ public class AccountResource {
 
     private final MailService mailService;
 
+    @Autowired
+    private CacheManager cm;
+
     public AccountResource(UserRepository userRepository, UserService userService, MailService mailService) {
         this.userRepository = userRepository;
         this.userService = userService;
@@ -62,6 +67,14 @@ public class AccountResource {
             throw new InvalidPasswordException();
         }
         User user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
+    }
+
+    @PostMapping("/logout")
+    public void logoutAction() {
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        if (cm.getCache("jwtvault") != null) {
+            cm.getCache("jwtvault").remove(login);
+        }
     }
 
     /**

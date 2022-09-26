@@ -5,6 +5,7 @@ import com.untralvious.demo.security.security.jwt.JWTFilter;
 import com.untralvious.demo.security.security.jwt.TokenProvider;
 import com.untralvious.demo.security.service.UserService;
 import com.untralvious.demo.security.web.rest.vm.LoginVM;
+import javax.cache.CacheManager;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -28,6 +29,9 @@ public class UserJWTController {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
     @Autowired
+    private CacheManager cm;
+
+    @Autowired
     private UserService userService;
 
     public UserJWTController(TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder) {
@@ -48,6 +52,7 @@ public class UserJWTController {
         String jwt = tokenProvider.createToken(authentication, loginVM.isRememberMe());
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(JWTFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
+        cm.getCache("jwtvault").put(loginVM.getUsername(), jwt);
         return new ResponseEntity<>(new JWTToken(jwt), httpHeaders, HttpStatus.OK);
     }
 
