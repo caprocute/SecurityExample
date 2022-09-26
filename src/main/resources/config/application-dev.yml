@@ -32,8 +32,8 @@ spring:
       indent-output: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:mysql://localhost:3307/SecurityExample?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
-    username: root
+    url: ENC(poSltdUrqnlhEoBNj/dzy+CDmSzUcPMQ7aJwaEQUhnYWBOsdbafB4IkQojNWDwF1HKEPBda9LMZK/cin/fVznzQYred64QJ4Ba0N3tkNU/iZc7wbVtKekezqBKuG84kP2CT6BGziYeEW1XYUdr+9g78LpWi3lCipJxyvD9b34+5C4NTTYxMAA0wdv1GbE8F4aVEVoY0VOb9JpDx5RjeEF/ZxuxFMbd8CPZqAoAePoxtpuAcMojH9mA==)
+    username: ENC(+6hCZkYrt64iO/QPNcWcUg==)
     password:
     hikari:
       poolName: Hikari
@@ -112,3 +112,8 @@ jhipster:
 # ===================================================================
 
 # application:
+
+jasypt:
+  encryptor:
+    password: Mic2020@!@#@
+    bean: jasyptStringEncryptor
