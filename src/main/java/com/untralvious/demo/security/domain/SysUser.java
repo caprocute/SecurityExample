@@ -2,6 +2,7 @@ package com.untralvious.demo.security.domain;
 
 import java.sql.Timestamp;
 import javax.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 @Table(name = "sys_user", schema = "security_example", catalog = "")
@@ -116,6 +117,8 @@ public class SysUser {
     @Column(name = "client_id")
     private String clientId;
 
+    @GeneratedValue(generator = "system-uuid")
+    @GenericGenerator(name = "system-uuid", strategy = "uuid")
     public String getId() {
         return id;
     }
@@ -330,6 +333,14 @@ public class SysUser {
 
     public void setClientId(String clientId) {
         this.clientId = clientId;
+    }
+
+    public String getLogin() {
+        return this.username;
+    }
+
+    public void setLogin(String username) {
+        this.username = username;
     }
 
     @Override
